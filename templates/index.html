@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+<div class="maincontainer">
+    <div class='logoHeader'>
+        <div class="logo">
+            <img src="/static/im12.png" width="500px" height="400px">
+        </div>
+        <h1 style="text-align: center">Share a Little, Care a Little<br>Donate Blood</h1>
+        
+    </div>
+    
+    <div class="content">
+        <h1 style="text-align: center">Login</h1>
+        <div class="form">
+            <form action="/" method="POST">
+                <input type="radio" id="donor" name="user" value="donor" checked="checked">
+                <label for="donor">Donor</label>
+                <input type="radio" id="recipient" name="user" value="recipient">
+                <label for="recipient">Recipient</label>
+                <input type="radio" id="admin" name="user" value="admin">
+                <label for="admin">Admin</label><br><br>
+    
+                <div class="inputcontainer">
+                    <div class="labelstyle">
+                        <div class="anothercontainer2">
+                            <div class="inside">
+                                <label for="email">Email:   </label><br>
+
+                            </div>
+                            <div class="inside">
+                                <label for="password">Password:   </label><br>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="labelstyle">
+                        <div class="anothercontainer">
+                            <div class="inside">
+                                <input type="text" name="email" id="email"><br>
+
+                            </div>
+                            <input type="password" name="password" id="password"><br>
+
+                        </div>
+    
+                    </div>
+                    
+                </div>
+                <input type="submit" value="Login">
+            </form>
+            <a href="/register">or create a new account</a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
