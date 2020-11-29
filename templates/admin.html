@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+<div class="navbar">
+    
+    <a href="/">Logout</a>
+    
+    <img src="/static/im12.png" width="50px" height="50px">
+
+    <text>BloodMate</text>
+</div>
+
+<div class="maincontainer">
+    <div class='logoHeader'>
+        <div class="logo">
+            <img src="/static/im12.png" width="500px" height="400px">
+        </div>
+        <h1 style="text-align: center">BloodMate:<br>Admin Portal</h1>
+        
+    </div>
+    <div class="content">
+
+        
+        <br><br>
+
+        <form action="/bloodproduct">
+            <input type="submit" value="Blood Products" />
+        </form>
+
+        <form action="/donors_admin">
+            <input type="submit" value="Donors" />
+        </form>
+
+        <form action="/recipients_admin">
+            <input type="submit" value="Recipients" />
+        </form>
+
+        <form action="/testcenters_admin">
+            <input type="submit" value="Test centers" />
+        </form>
+
+        <form action="/screening_admin">
+            <input type="submit" value="Perform screening" />
+        </form>
+
+
+
+        
+        
+
+
+
+    </form>
+    
+    <a href="/register">logout</a>
+    <a href="/register">Change account information</a>
+
+
+        
+
+
+    </div>
+    
+</div>
+{% endblock %}

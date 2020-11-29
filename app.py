@@ -23,6 +23,7 @@ class Donor(db.Model):
     availability = db.Column(db.Boolean())
     screening_status = db.Column(db.Boolean())
     donation_category = db.Column(db.String(3))
+
     
 
     def __repr__(self):
@@ -52,6 +53,15 @@ class Administrator(db.Model):
     def __repr__(self):
         return '<Administrator %r>' % self.id
 
+class stock(db.Model):
+    batch_id = db.Column(db.Integer, primary_key=True)
+    blood_type = db.Column(db.String(30), nullable=False)
+    quantity =  db.Column(db.Integer,  nullable=False)     
+    category = db.Column(db.String(20), nullable=False)
+    expiry_date = db.Column(db.DateTime)
+
+    def __repr__(self):
+        return '<stock %r>' % self.id
 
 class Login(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -88,15 +98,50 @@ def index():
 
 @app.route('/donor')
 def donor_portal():
-    return 'Donor Login Successful!'
+    return render_template('donor.html')
+
+@app.route('/donate')
+def donate():
+    return 'Donate now!'    
 
 @app.route('/recipient')
 def recipient_portal():
-    return 'Recipient Login Successful!'
+    return render_template('recipient.html')
+
+@app.route('/new_request')
+def new_request():
+    return 'Make a new request now!'
+
 
 @app.route('/admin')
 def admin_portal():
-    return 'Admin Login Successful!'
+    return render_template('admin.html')
+
+@app.route('/bloodproduct')
+def blood_product():
+    return render_template('bloodproduct.html')
+    
+@app.route('/recipients_admin')
+def recipients_admin():
+    return render_template('recipients_admin.html')
+
+@app.route('/donors_admin')
+def donors_admin():
+    return render_template('donors_admin.html')
+
+@app.route('/testcenters_admin')
+def testcenters_admin():
+    return render_template('testcenters_admin.html')    
+
+@app.route('/screening_admin')
+def screening_admin():
+    return render_template('screening_admin.html')      
+
+@app.route('/product_input')
+def product_input():
+    return render_template('product_input.html')       
+
+
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
