@@ -24,20 +24,17 @@
     </div>
     
     <div class="content_donor">
-        <h1 style="text-align: center">Donate</h1>
+        <h1 style="text-align: center">Search Recipient Requests</h1>
         <div class="form">
-            <form action="/register" method="POST">
+            <form action="/screening_donor" method="POST">
 
                 <div class="inputcontainer_register">
                     <div class="labelstyle">
                         <div class="anothercontainer2">
 
-                            <div class="inside">
-                                <label for="email">Quantity:   </label><br>
 
-                            </div>
                             <div class="inside">
-                                <label for="password">Category:   </label><br>
+                                <label for="password">City:   </label><br>
 
                             </div>
 
@@ -46,26 +43,18 @@
                                 <label for="blood_type">Blood Type: </label><br>
 
                             </div>
-                            <div class="inside">
-                                <label for="dob">Expiry Date:   </label><br>
 
-                            </div>
                         </div>
                     </div>
                     <div class="labelstyle">
                         <div class="anothercontainer">
                            
-                            <div class="inside">
-                                <input type="text" name="city" id="city" ><br>
 
-                            </div>
                             <div class="inside">
-                                <select id="Category" name="Category" style="width: 175px;">
-                                    <option value="Blood">Blood</option>
-                                    <option value="Plasma">Plasma</option>
-                                    <option value="Plasma">RBC</option>
-                                    <option value="Plasma">WBC</option>
-                                    <option value="Plasma">Platelets</option>
+                                <select id="City" name="aa" style="width: 175px;">
+                                    <option value="Karachi">Karachi</option>
+                                    <option value="Lahore">Lahore</option>
+                                    <option value="Islamabad">Islamabad</option>
                                     <option value="other">Other</option>
                                 </select>
 
@@ -83,22 +72,23 @@
                                 </select>
 
                             </div>
-                            <div class="inside">
-                                <input type="date" name="dob" id="dob" ><br>
 
-                            </div>
 
                         </div>
-    
+                        <input type="submit" value="View Requests" />
                     </div>
-                    
+
                 </div>
 
                 <p style="margin: 1px; color: maroon; text-align: center;">{{error}}</p>
-                <input type="submit" value="Submit Request">
+
+
+                    <input type="submit" value="OR Book Screening" />
+ 
+               
          
             </form>
-
+            <a href="/">go back</a>
 
         </div>
     </div>

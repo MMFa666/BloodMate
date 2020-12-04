@@ -23,6 +23,7 @@ class Donor(db.Model):
     availability = db.Column(db.Boolean())
     screening_status = db.Column(db.Boolean())
     donation_category = db.Column(db.String(3))
+    appointments = db.relationship('Screening_Appointment', backref='donor', lazy=True)
 
     
 
@@ -38,6 +39,7 @@ class Recipient(db.Model):
     email_id = db.Column(db.String(50), nullable=False)
     phone_number = db.Column(db.String(13), nullable=False)
     blood_type = db.Column(db.String(3), nullable=False)
+    appointments = db.relationship('Donation_Request', backref='recipient', lazy=True)
     
 
     def __repr__(self):
@@ -53,15 +55,17 @@ class Administrator(db.Model):
     def __repr__(self):
         return '<Administrator %r>' % self.id
 
-class stock(db.Model):
-    batch_id = db.Column(db.Integer, primary_key=True)
+
+class Stock(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
     blood_type = db.Column(db.String(30), nullable=False)
     quantity =  db.Column(db.Integer,  nullable=False)     
     category = db.Column(db.String(20), nullable=False)
     expiry_date = db.Column(db.DateTime)
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
-        return '<stock %r>' % self.id
+        return '<Stock %r>' % self.id
 
 class Login(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -71,6 +75,41 @@ class Login(db.Model):
 
     def __repr__(self):
         return '<Login %r>' % self.id
+
+class Hospital(db.Model):
+    test_center_id = db.Column(db.Integer, primary_key=True)
+    test_center_name = db.Column(db.String(50), nullable=False)
+    location = db.Column(db.String(30))
+    phone_number = db.Column(db.String(13), nullable=False)
+    appointments = db.relationship('Screening_Appointment', backref='hospital', lazy=True)
+
+    def __repr__(self):
+        return '<Hospital %r>' % self.test_center_id
+
+
+class Screening_Appointment(db.Model):
+    appointment_id = db.Column(db.Integer, primary_key=True)
+    appointment_time = db.Column(db.DateTime)
+    screening_result = db.Column(db.Boolean())
+    test_center_id = db.Column(db.Integer, db.ForeignKey('hospital.test_center_id'), nullable=False)
+    donor_id = db.Column(db.Integer, db.ForeignKey('donor.id'), nullable=False)
+    
+    phone_number = db.Column(db.String(13), nullable=False)
+
+    def __repr__(self):
+        return '<Screening_Appointment %r>' % self.appointment_id
+
+
+class Donation_Request(db.Model):
+    request_id = db.Column(db.Integer, primary_key=True)
+    blood_type = db.Column(db.String(30), nullable=False)
+    quantity =  db.Column(db.Integer,  nullable=False)     
+    request_category = db.Column(db.String(20), nullable=False)
+    recipient_id = db.Column(db.Integer, db.ForeignKey('recipient.id'), nullable=False)
+
+    def __repr__(self):
+        return '<Donation_Request %r>' % self.request_id
+
 
 
 
@@ -117,9 +156,46 @@ def new_request():
 def admin_portal():
     return render_template('admin.html')
 
-@app.route('/bloodproduct')
+@app.route('/addproduct', methods=['POST', 'GET'])
+def addproduct():
+    if request.method == 'POST':
+        bloodType = request.form['bloodType']
+        prodQuant = request.form['prodQuant'] 
+        prodCat = request.form['prodCat']
+        expDate = request.form['expDate']
+
+        expDate= datetime.strptime(expDate,'%Y-%m-%d')
+        new_prod = Stock(id= generate_random_id(), blood_type= bloodType, quantity= prodQuant, category= prodCat, expiry_date= expDate)
+
+        try:
+            db.session.add(new_prod)
+            db.session.commit()
+            return redirect('/bloodproduct')
+        except Exception as e:
+            'There was an issue adding the blood product :('
+            print(e)
+            return redirect('/')
+    else:
+        return render_template('addproduct.html')
+
+
+@app.route('/deleteproduct/<int:id>')
+def deleteproduct(id):
+    prod_del = Stock.query.get_or_404(id)
+
+    try:
+        db.session.delete(prod_del)
+        db.session.commit()
+        return redirect('/bloodproduct')
+    except Exception as e:
+        print(e)
+        return 'Delete Failed'
+    
+@app.route('/bloodproduct', methods=['POST','GET'])
 def blood_product():
-    return render_template('bloodproduct.html')
+    bps = Stock.query.order_by(Stock.date_created).all()
+    return render_template('bloodproduct.html', bps=bps)
+
     
 @app.route('/recipients_admin')
 def recipients_admin():

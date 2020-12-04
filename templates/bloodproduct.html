@@ -1,52 +1,58 @@
 {% extends 'base.html' %}
 
 {% block head %}
-
+<h1>Hello Admin! You are currently viewing all the products</h1>
 {% endblock %}
 
 {% block body %}
 <div class="maincontainer">
-    <div class='logoHeader'>
-        <div class="logo">
-            <img src="/static/im12.png" width="500px" height="400px">
-        </div>
-        <h1 style="text-align: center">BloodMate:<br>Admin Portal</h1>
-        
-    </div>
-    <div class="content">
-
-        <br><br><br>
-
-
-        <form action="/product_input">
-            <input type="submit" value="Add Products" />
-        </form>
-
-
-
-        <div class="form">
-            <form action="/" method="POST">
     
-                <p style="margin: 1px; color: maroon; text-align: center;">{{error}}</p>
-                <input type="submit" value="Remove Products">
-                
-        </div>
-   
 
-        <div class="form">
-            <form action="/" method="POST">
+    <table>
+        <tr>
+            <th>
+                Batch ID
+            </th>
+            <th>
+                Product Category
+            </th>
+            <th>
+                Blood Type
+            </th>
+            <th>
+                Quantity
+            </th>
+            <th>
+                Added
+            </th>
+            <th>
+               Expiry Date
+            </th>
+            <th>
+                Action
+            </th>
+        </tr>
+        {% for bp in bps %}
+            <tr>
+                <td>{{ bp.id }}</td>
+                <td>{{ bp.category }}</td>
+                <td>{{ bp.blood_type }}</td>
+                <td>{{ bp.quantity }}</td>
+                <td>{{ bp.date_created.date() }}</td>
+                <td>{{ bp.expiry_date }}</td>
+                <td>
+                    <a href='/deleteproduct/{{bp.id}}'>Delete Product</a>
+                    <br>
+                    <a href=''>Update Product</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
     
-                <p style="margin: 1px; color: maroon; text-align: center;">{{error}}</p>
-                <input type="submit" value="View Products">
-                
-        </div>
 
-    </form>
-    <a href="/admin">Go Back</a>
-        
-
-
-    </div>
-    
 </div>
+<div class="container2">
+    <a href='/addproduct'>Add a New Product</a>
+</div>
+
 {% endblock %}
