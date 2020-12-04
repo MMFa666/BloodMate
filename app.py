@@ -19,10 +19,11 @@ class Donor(db.Model):
     gender = db.Column(db.String(10))
     email_id = db.Column(db.String(50), nullable=False)
     phone_number = db.Column(db.String(13), nullable=False)
-    blood_type = db.Column(db.String(3), nullable=False, primary_key=True)
+    blood_type = db.Column(db.String(3), nullable=False)
     availability = db.Column(db.Boolean())
     screening_status = db.Column(db.Boolean())
     donation_category = db.Column(db.String(3))
+    new_date_created = db.Column(db.DateTime, default=datetime.utcnow)
     appointments = db.relationship('Screening_Appointment', backref='donor', lazy=True)
 
     
@@ -196,14 +197,27 @@ def blood_product():
     bps = Stock.query.order_by(Stock.date_created).all()
     return render_template('bloodproduct.html', bps=bps)
 
+@app.route('/deletedonor/<int:id>')
+def deletedonor(id):
+    donor_del = Donor.query.get_or_404(id)
+    print(id)
+    try:
+        db.session.delete(donor_del)
+        db.session.commit()
+        return redirect('/donors_admin')
+    except Exception as e:
+        print(e)
+        return 'Delete Failed'
     
 @app.route('/recipients_admin')
 def recipients_admin():
     return render_template('recipients_admin.html')
 
-@app.route('/donors_admin')
+@app.route('/donors_admin', methods=['POST','GET'])
 def donors_admin():
-    return render_template('donors_admin.html')
+    donors = Donor.query.order_by(Donor.new_date_created).all()
+    return render_template('donors_admin.html', donors=donors)
+
 
 @app.route('/testcenters_admin')
 def testcenters_admin():
