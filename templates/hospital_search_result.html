@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<h1>Hello Donor! You are currently viewing list of all the available hospitals</h1>
+{% endblock %}
+
+{% block body %}
+<div class="maincontainer">
+    
+
+    <table>
+        <tr>
+            
+            <th>
+                Test Center Name
+            </th>
+            <th>
+                Location
+            </th>
+            <th>
+                Phone Number
+            </th>
+            
+        </tr>
+        {% for hosp in tests2 %}
+            <tr>
+               
+                <td>{{ hosp.test_center_name }}</td>
+                <td>{{ hosp.location }}</td>
+                <td>{{ hosp.phone_number }}</td>
+                
+            </tr>
+        {% endfor %}
+    </table>
+    
+
+</div>
+
+
+{% endblock %}

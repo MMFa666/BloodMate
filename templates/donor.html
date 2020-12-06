@@ -19,79 +19,33 @@
         <div class="logo">
             <img src="/static/im12.png" width="500px" height="400px">
         </div>
-
+        <h1 style="text-align: center">Care a little<br> Donate Blood Now!</h1>
         
     </div>
-    
-    <div class="content_donor">
-        <h1 style="text-align: center">Search Recipient Requests</h1>
-        <div class="form">
-            <form action="/screening_donor" method="POST">
+    <div class="content">
 
-                <div class="inputcontainer_register">
-                    <div class="labelstyle">
-                        <div class="anothercontainer2">
+        
+        <br><br>
 
+        <form action="">
+            <input type="submit" value="View Recipient Requests" />
+        </form>
+        <br><br>
+        
+        
 
-                            <div class="inside">
-                                <label for="password">City:   </label><br>
+        <form action="/screening_donor">
+            <input type="submit" value="Book Screening Appointment" />
+        </form>
 
-                            </div>
+        <br><br>
+        <form action="/donor_search_hospital_help">
+            <input type="submit" value="Search Test Centers" />
+        </form>
 
+    </form>
 
-                            <div class="inside">
-                                <label for="blood_type">Blood Type: </label><br>
-
-                            </div>
-
-                        </div>
-                    </div>
-                    <div class="labelstyle">
-                        <div class="anothercontainer">
-                           
-
-                            <div class="inside">
-                                <select id="City" name="aa" style="width: 175px;">
-                                    <option value="Karachi">Karachi</option>
-                                    <option value="Lahore">Lahore</option>
-                                    <option value="Islamabad">Islamabad</option>
-                                    <option value="other">Other</option>
-                                </select>
-
-                            </div>
-                            <div class="inside">
-                                <select id="blood_type" name="blood_type" style="width: 175px;">
-                                    <option value="A+">A+</option>
-                                    <option value="A-">A-</option>
-                                    <option value="B+">B+</option>
-                                    <option value="B-">B-</option>
-                                    <option value="AB+">AB+</option>
-                                    <option value="AB-">AB-</option>
-                                    <option value="O+">O+</option>
-                                    <option value="O-">O-</option>
-                                </select>
-
-                            </div>
-
-
-                        </div>
-                        <input type="submit" value="View Requests" />
-                    </div>
-
-                </div>
-
-                <p style="margin: 1px; color: maroon; text-align: center;">{{error}}</p>
-
-
-                    <input type="submit" value="OR Book Screening" />
- 
-               
-         
-            </form>
-            <a href="/">go back</a>
-
-        </div>
     </div>
-
+    
 </div>
 {% endblock %}

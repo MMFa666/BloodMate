@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+<div class="maincontainer">
+    
+    <div class="content">
+        <h1 style="text-align: center">Add Hospital</h1>
+        <div class="form">
+            <form action="/addhospital" method='POST'>
+                
+                <div class="inputcontainer">
+                    <div class="labelstyle">
+                        <div class="anothercontainer2">
+                            <div class="inside">
+                                <label for="centerName">Hospital Name:   </label><br>
+                            </div>
+                            <div class="inside">
+                                <label for="loc">Location:   </label><br>
+                            </div>
+                            <div class="inside">
+                                <label for="phoneNum">Phone Number:   </label><br>
+                            </div>
+            
+                        </div>
+                    </div>
+                    <div class="labelstyle">
+                        <div class="anothercontainer">
+
+                            <div class="inside">
+                                <input type="text" name="centerName" id="centerName"><br>
+                            </div>
+                            <div class="inside">
+                                <input type="text" name="loc" id="loc"><br>
+                            </div>
+                            <div class="inside">
+                                <input type="tel" name="phoneNum" id="phoneNum" placeholder="03201234567"><br>
+
+                            </div>
+                    
+                        </div>
+    
+                    </div>
+                    
+                </div>
+                <p style="margin: 70px; color: maroon; text-align: center;">{{error}}</p>
+                <input type="submit" value="Add">
+            </form>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

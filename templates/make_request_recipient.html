@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+<div class="maincontainer">
+    
+    <div class="content_req">
+        <h1 style="text-align: center; padding-top: 12px; ">Make a Donation Request</h1>
+        <div class="form">
+            <form action="/make_request_recipient" method='POST'>
+    
+                <div class="inputcontainer">
+                    <div class="labelstyle">
+                        <div class="anothercontainer2">
+                            <div class="inside">
+                                <label for="reqCat">Category:   </label><br>
+                            </div>
+                            <div class="inside">
+                                <label for="bloodType">Blood Type:   </label><br>
+                            </div>
+                            <div class="inside">
+                                <label for="reqQuant">Quantity:   </label><br>
+                            </div>
+                           
+                        </div>
+                    </div>
+                    <div class="labelstyle">
+                        <div class="anothercontainer">
+                            <div class="inside">
+                                <input type="text" name="reqCat" id="reqCat"><br>
+                            </div>
+                            <div class="inside">
+                                <input type="text" name="bloodType" id="bloodType"><br>
+                            </div>
+                            <div class="inside">
+                                <input type="number" name="reqQuant" id="reqQuant"><br>
+                            </div>
+                    
+                        </div>
+    
+                    </div>
+                    
+                </div>
+                <p style="margin: 70px; color: maroon; text-align: center;">{{error}}</p>
+                <input type="submit" value="Submit Request">
+            </form>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

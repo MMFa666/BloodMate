@@ -1,46 +1,53 @@
 {% extends 'base.html' %}
 
 {% block head %}
-
+<h1>Hello Admin! You are currently viewing list of all the hospitals</h1>
 {% endblock %}
 
 {% block body %}
 <div class="maincontainer">
-    <div class='logoHeader'>
-        <div class="logo">
-            <img src="/static/im12.png" width="500px" height="400px">
-        </div>
-        <h1 style="text-align: center">BloodMate:<br>Admin Portal</h1>
-        
-    </div>
-    <div class="content">
-
-        <br><br><br><br>
-
-
-        <form action="/bloodproduct">
-            <input type="submit" value="Add Hospital" />
-        </form>
-
-
-
-        <div class="form">
-            <form action="/" method="POST">
     
-                <p style="margin: 1px; color: maroon; text-align: center;">{{error}}</p>
-                <input type="submit" value="Remove Hospital">
-                
-        </div>
-   
 
-
-
-    </form>
- 
-        
-
-
-    </div>
+    <table>
+        <tr>
+            <th>
+                Test Center ID
+            </th>
+            <th>
+                Test Center Name
+            </th>
+            <th>
+                Location
+            </th>
+            <th>
+                Phone Number
+            </th>
+            <th>
+                Appointments
+            </th>
+            <th>
+                Action
+            </th>
+        </tr>
+        {% for hosp in tests %}
+            <tr>
+                <td>{{ hosp.id }}</td>
+                <td>{{ hosp.test_center_name }}</td>
+                <td>{{ hosp.location }}</td>
+                <td>{{ hosp.phone_number }}</td>
+                <td>{{ hosp.appointments }}</td>
+                <td>
+                    <a href='/deletehospital/{{hosp.id}}'>Delete Hospital</a>
+                    
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
     
+
 </div>
+<div class="container2">
+    <a href='/addhospital'>Add a New Hospital</a>
+</div>
+
 {% endblock %}

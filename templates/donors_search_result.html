@@ -1,16 +1,13 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<h1>Hello Admin! You are currently viewing all the donors</h1>
+<h1>Hello Recipient! You are currently viewing all the available donors</h1>
 {% endblock %}
 
 {% block body %}
 <div class="maincontainer">
     <table>
         <tr>
-            <th>
-                ID
-            </th>
             <th>
                 Name
             </th>
@@ -26,26 +23,15 @@
             <th>
                 Location
             </th>
-            <th>
-                Added
-            </th>
-            <th>
-                Action
-            </th>
+            
         </tr>
-        {% for donor in donors %}
+        {% for donor in donors2 %}
             <tr>
-                <td>{{ donor.id }}</td>
                 <td>{{ donor.name }}</td>
                 <td>{{ donor.email_id }}</td>
                 <td>{{ donor.phone_number }}</td>
                 <td>{{ donor.blood_type }}</td>
                 <td>{{ donor.city }}</td>
-                <td>{{ donor.new_date_created.date() }}</td>
-                <td>
-                    <a href='/deletedonor/{{donor.id}}'>Delete Donor</a>
-                    <br>
-                </td>
             </tr>
         {% endfor %}
     </table>

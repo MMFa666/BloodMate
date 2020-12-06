@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+<div class="maincontainer">
+    
+    <div class="content_sd">
+        <h1 style="text-align: center">Book Screening Appointment</h1>
+        <div class="form">
+            <form action="/screening_donor" method='POST'>
+    
+                <div class="inputcontainer">
+                    <div class="labelstyle">
+                        <div class="anothercontainer2">
+                            <div class="inside">
+                                <label for="time_is">Time:   </label><br>
+                            </div>
+                            <div class="inside">
+                                <label for="app_date">Date:   </label><br>
+                            </div>
+                            <div class="inside">
+                                <label for="hosp_name">Test Center Name:   </label><br>
+                            </div>
+                        
+                        </div>
+                    </div>
+                    <div class="labelstyle">
+                        <div class="anothercontainer">
+                            <div class="inside">
+                                <input type="time" name="time_is" id="time_is"><br>
+                            </div>
+                            <div class="inside">
+                                <input type="date" name="app_date" id="app_date"><br>
+                            </div>
+                            <div class="inside">
+                                <input type="text" name="hosp_name" id="hosp_name"><br>
+                            </div>
+                    
+                        </div>
+    
+                    </div>
+                    
+                </div>
+                <p style="margin: 90px; color: maroon; text-align: center;">{{error}}</p>
+                <input type="submit" value="Submit">
+            </form>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -24,7 +24,7 @@ class Donor(db.Model):
     screening_status = db.Column(db.Boolean())
     donation_category = db.Column(db.String(3))
     new_date_created = db.Column(db.DateTime, default=datetime.utcnow)
-    appointments = db.relationship('Screening_Appointment', backref='donor', lazy=True)
+    #appointments = db.relationship('Screening_Appointment', backref='donor', lazy=True)
 
     
 
@@ -40,7 +40,8 @@ class Recipient(db.Model):
     email_id = db.Column(db.String(50), nullable=False)
     phone_number = db.Column(db.String(13), nullable=False)
     blood_type = db.Column(db.String(3), nullable=False)
-    appointments = db.relationship('Donation_Request', backref='recipient', lazy=True)
+    rec_date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    #appointments = db.relationship('Donation_Request', backref='recipient', lazy=True)
     
 
     def __repr__(self):
@@ -78,27 +79,29 @@ class Login(db.Model):
         return '<Login %r>' % self.id
 
 class Hospital(db.Model):
-    test_center_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     test_center_name = db.Column(db.String(50), nullable=False)
     location = db.Column(db.String(30))
     phone_number = db.Column(db.String(13), nullable=False)
-    appointments = db.relationship('Screening_Appointment', backref='hospital', lazy=True)
+    #appointments = db.relationship('Screening_Appointment', backref='hospital', lazy=True)
 
     def __repr__(self):
-        return '<Hospital %r>' % self.test_center_id
+        return '<Hospital %r>' % self.id
 
 
 class Screening_Appointment(db.Model):
-    appointment_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     appointment_time = db.Column(db.DateTime)
+    appointment_date = db.Column(db.DateTime)
     screening_result = db.Column(db.Boolean())
-    test_center_id = db.Column(db.Integer, db.ForeignKey('hospital.test_center_id'), nullable=False)
-    donor_id = db.Column(db.Integer, db.ForeignKey('donor.id'), nullable=False)
+    #test_center_id = db.Column(db.Integer, db.ForeignKey('hospital.id'), nullable=False)
+    test_center_name = db.Column(db.String(50))
+    #donor_id = db.Column(db.Integer, db.ForeignKey('donor.id'), nullable=False)
     
     phone_number = db.Column(db.String(13), nullable=False)
 
     def __repr__(self):
-        return '<Screening_Appointment %r>' % self.appointment_id
+        return '<Screening_Appointment %r>' % self.id
 
 
 class Donation_Request(db.Model):
@@ -106,7 +109,7 @@ class Donation_Request(db.Model):
     blood_type = db.Column(db.String(30), nullable=False)
     quantity =  db.Column(db.Integer,  nullable=False)     
     request_category = db.Column(db.String(20), nullable=False)
-    recipient_id = db.Column(db.Integer, db.ForeignKey('recipient.id'), nullable=False)
+    #recipient_id = db.Column(db.Integer, db.ForeignKey('recipient.id'), nullable=False)
 
     def __repr__(self):
         return '<Donation_Request %r>' % self.request_id
@@ -140,6 +143,26 @@ def index():
 def donor_portal():
     return render_template('donor.html')
 
+@app.route('/search_donor', methods =['POST', 'GET'])
+def search_donor():
+    city_is = request.form['location']
+    blood_type_is = request.form['blood_type']
+
+    donors2 = Donor.query.filter_by(blood_type = blood_type_is, city= city_is).all()
+    return render_template('donors_search_result.html', donors2 = donors2)
+
+@app.route('/donor_search_hospital_help', methods =['POST', 'GET'])
+def donor_search_hospital_help():
+   
+    return render_template('donor_search_hospital.html')
+
+@app.route('/donor_search_hospital', methods =['POST', 'GET'])
+def donor_search_hospital():
+    locs = request.form['location']
+
+    tests2 = Hospital.query.filter_by(location= locs).all()
+    return render_template('hospital_search_result.html', tests2 = tests2)
+
 @app.route('/donate')
 def donate():
     return 'Donate now!'    
@@ -147,6 +170,27 @@ def donate():
 @app.route('/recipient')
 def recipient_portal():
     return render_template('recipient.html')
+
+@app.route('/make_request_recipient', methods=['POST','GET'])
+def make_request_recipient():
+    if request.method == 'POST':
+        bloodType = request.form['bloodType']
+        reqQuant = request.form['reqQuant'] 
+        reqCat = request.form['reqCat']
+        
+        new_req = Donation_Request(request_id= generate_random_id(), blood_type= bloodType, quantity= reqQuant, request_category= reqCat)
+
+        try:
+            db.session.add(new_req)
+            db.session.commit()
+            return redirect('/recipient')
+        except Exception as e:
+            'There was an issue adding the blood product :('
+            print(e)
+            return redirect('/')
+    else:
+        return render_template('make_request_recipient.html')
+
 
 @app.route('/new_request')
 def new_request():
@@ -211,7 +255,20 @@ def deletedonor(id):
     
 @app.route('/recipients_admin')
 def recipients_admin():
-    return render_template('recipients_admin.html')
+    recipients = Recipient.query.order_by(Recipient.rec_date_created).all()
+    return render_template('recipients_admin.html', recipients=recipients)
+
+@app.route('/deleterecipient/<int:id>')
+def deleterecipient(id):
+    rec_del = Recipient.query.get_or_404(id)
+    print(id)
+    try:
+        db.session.delete(rec_del)
+        db.session.commit()
+        return redirect('/recipients_admin')
+    except Exception as e:
+        print(e)
+        return 'Delete Failed'
 
 @app.route('/donors_admin', methods=['POST','GET'])
 def donors_admin():
@@ -219,13 +276,70 @@ def donors_admin():
     return render_template('donors_admin.html', donors=donors)
 
 
-@app.route('/testcenters_admin')
+@app.route('/testcenters_admin', methods=['POST','GET'])
 def testcenters_admin():
-    return render_template('testcenters_admin.html')    
+    tests = Hospital.query.order_by(Hospital.test_center_name).all()
+    return render_template('testcenters_admin.html', tests = tests)    
+
+@app.route('/addhospital', methods=['POST', 'GET'])
+def addhospital():
+   
+    if request.method == 'POST':
+        centerName = request.form['centerName'] 
+        loc = request.form['loc']
+        phoneNum = request.form['phoneNum']
+
+        
+        new_hosp = Hospital(id= generate_random_id(), test_center_name= centerName , location= loc, phone_number = phoneNum)
+
+        try:
+            db.session.add(new_hosp)
+            db.session.commit()
+            return redirect('/testcenters_admin')
+        except Exception as e:
+            'There was an issue adding the blood product :('
+            print(e)
+            return redirect('/')
+    else:
+        return render_template('addhospital.html')
+
+@app.route('/deletehospital/<int:id>')
+def deletehospital(id):
+    hosp_del = Hospital.query.get_or_404(id)
+    print(id)
+    try:
+        db.session.delete(hosp_del)
+        db.session.commit()
+        return redirect('/testcenters_admin')
+    except Exception as e:
+        print(e)
+        return 'Delete Failed'
 
 @app.route('/screening_admin')
 def screening_admin():
-    return render_template('screening_admin.html')      
+    return render_template('screening_admin.html')
+    
+
+@app.route('/screening_donor', methods=['POST', 'GET'])
+def screening_donor():
+    if request.method == 'POST':
+        time_is = request.form['time_is'] 
+        app_date = request.form['app_date']
+        hosp_name = request.form['hosp_name']
+
+        
+        new_app = Screening_Appointment(id= generate_random_id(), appointment_time= time_is , appointment_date= app_date, test_center_name =hosp_name)
+
+        try:
+            db.session.add(new_app)
+            db.session.commit()
+            return redirect('/donor')
+        except Exception as e:
+            'There was an issue adding the blood product :('
+            print(e)
+            return redirect('/')
+    else:
+        return render_template('screening_donor.html')  
 
 @app.route('/product_input')
 def product_input():
