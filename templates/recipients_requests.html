@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<h1>Hello Admin! You are currently viewing all the recipients' requests</h1>
+{% endblock %}
+
+{% block body %}
+<div class="maincontainer">
+    
+
+    <table>
+        <tr>
+            <th>
+                Request ID
+            </th>
+            <th>
+                Request Category
+            </th>
+            <th>
+                Blood Type
+            </th>
+            <th>
+                Quantity
+            </th>
+            <th>
+                Action
+            </th>
+        </tr>
+        {% for r in reqs %}
+            <tr>
+                <td>{{ r.request_id }}</td>
+                <td>{{ r.request_category }}</td>
+                <td>{{ r.blood_type }}</td>
+                <td>{{ r.quantity }}</td>
+                <td>
+                    <a href='/deleterecipientrequest/{{r.request_id}}'>Delete Request</a>
+                    <br>
+                    <a href=''>Update Request</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    
+
+</div>
+
+
+{% endblock %}

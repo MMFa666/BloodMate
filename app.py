@@ -163,6 +163,12 @@ def donor_search_hospital():
     tests2 = Hospital.query.filter_by(location= locs).all()
     return render_template('hospital_search_result.html', tests2 = tests2)
 
+@app.route('/recipients_requests', methods =['POST', 'GET'])
+def recipients_requests():
+  
+    reqs = Donation_Request.query.order_by(Donation_Request.quantity).all()
+    return render_template('recipients_requests.html', reqs = reqs)
+
 @app.route('/donate')
 def donate():
     return 'Donate now!'    
