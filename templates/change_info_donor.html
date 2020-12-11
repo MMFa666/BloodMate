@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+<div class="maincontainer">
+    <div class='logoHeader'>
+        <div class="logo">
+            <img src="/static/im12.png" width="500px" height="400px">
+        </div>
+        <h1 style="text-align: center">Share a Little, Care a Little<br>Donate Blood</h1>
+        
+    </div>
+    
+    <div class="content_update_info">
+        <h1 style="text-align: center">Update Info</h1>
+        <div class="form">
+            <form action="/change_info_donor/{{id}}" method="POST">
+    
+                <div class="inputcontainer_update_info">
+                    <div class="labelstyle">
+                        <div class="anothercontainer2">
+                            <div class="inside">
+                                <label for="name">Name:   </label><br>
+
+                            </div>
+                            <div class="inside">
+                                <label for="email">Email:   </label><br>
+
+                            </div>
+                            <div class="inside">
+                                <label for="password">Password:   </label><br>
+
+                            </div>
+                            <div class="inside">
+                                <label for="contact">Contact No:   </label><br>
+
+                            </div>
+                            <div class="inside">
+                                <label for="city">City: </label><br>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="labelstyle">
+                        <div class="anothercontainer">
+                            <div class="inside">
+                                <input type="text" name="name" id="name" value={{name}}><br>
+
+                            </div>
+                            <div class="inside">
+                                <input type="text" name="email" id="email" value={{email}}><br>
+
+                            </div>
+                            <div class="inside">
+                                <input type="password" name="password" id="password" placeholder="Atleast 6 characters" value={{password}}><br>
+
+                            </div>
+                            <div class="inside">
+                                <input type="tel" name="contact" id="contact" placeholder="03201234567" value={{phone_number}}><br>
+
+                            </div>
+                            <div class="inside">
+                                <input type="text" name="city" id="city" value={{city}}><br>
+
+                            </div>
+
+                        </div>
+    
+                    </div>
+                    
+                </div>
+                <p style="margin: 1px; color: maroon; text-align: center;">{{error}}</p>
+                <input type="submit" value="Update">
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -129,12 +129,13 @@ def index():
             error='Invalid Credentials!'
             return render_template('index.html',error=error)
         else:
+            id=q.id
             if user_type=='donor':
-                return redirect('/donor')
+                return render_template('donor.html',id=id)
             elif user_type=='admin':
-                return redirect('/admin')
+                return render_template('admin.html',id=id)
             else:
-                return redirect('/recipient')
+                return render_template('recipient.html',id=id)
     else:
         return render_template('index.html',error=error)
 
@@ -250,9 +251,11 @@ def blood_product():
 @app.route('/deletedonor/<int:id>')
 def deletedonor(id):
     donor_del = Donor.query.get_or_404(id)
+    login_del = Login.query.get_or_404(id)
     print(id)
     try:
         db.session.delete(donor_del)
+        db.session.delete(login_del)
         db.session.commit()
         return redirect('/donors_admin')
     except Exception as e:
@@ -267,9 +270,11 @@ def recipients_admin():
 @app.route('/deleterecipient/<int:id>')
 def deleterecipient(id):
     rec_del = Recipient.query.get_or_404(id)
+    login_del = Login.query.get_or_404(id)
     print(id)
     try:
         db.session.delete(rec_del)
+        db.session.delete(login_del)
         db.session.commit()
         return redirect('/recipients_admin')
     except Exception as e:
@@ -399,9 +404,10 @@ def register():
         print('aaaaaaaaaa')
         q=Login.query.filter_by(email_id=email,user_type=user_type).first()
         if q==None:
-            new_login = Login(id=generate_random_id(),email_id=email,password=password,user_type=user_type)
+            id=generate_random_id()
+            new_login = Login(id=id,email_id=email,password=password,user_type=user_type)
             if user_type=='donor':
-                new_user=Donor(id=generate_random_id(),
+                new_user=Donor(id=id,
                                 email_id=email,
                                 name=name,
                                 gender=gender,
@@ -411,7 +417,7 @@ def register():
                                 date_of_birth=dob
                                 )
             else:
-                new_user=Recipient(id=generate_random_id(),
+                new_user=Recipient(id=id,
                                 email_id=email,
                                 name=name,
                                 gender=gender,
@@ -438,6 +444,151 @@ def register():
 
     else:
         return render_template('register.html',error=error)
+
+@app.route('/change_info_donor/<int:id>', methods=['POST', 'GET'])
+def change_info_donor(id):
+    # return render_template('product_input.html')
+    login = Login.query.get_or_404(id)
+    user = Donor.query.get_or_404(id)
+    error=''
+    if request.method == 'POST':
+        email=request.form['email']
+        password=request.form['password']
+        name=request.form['name']
+        contact=str(request.form['contact'])
+        city=request.form['city']
+
+        if len(name)==0:
+            error='Invalid Name!'
+            return render_template('change_info_donor.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password,error=error)
+
+        if len(email)==0:
+            error='Invalid Email!'
+            return render_template('change_info_donor.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password,error=error)
+
+        if len(password)<6:
+            error='Invalid Password!'
+            return render_template('change_info_donor.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password,error=error)
+
+        if len(contact)!=11 or contact[:2]!='03':
+            error='Invalid Contact!'
+            return render_template('change_info_donor.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password,error=error)
+        
+        if len(city)==0:
+            error='Invalid City!'
+            return render_template('change_info_donor.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password,error=error)
+        
+        try:
+            login.email_id=email
+            login.password=password
+
+            user.name=name
+            user.email_id=email
+            user.phone_number=contact
+            user.city=city
+            user.password=password
+
+            db.session.commit()
+            return render_template('donor.html',id=id)
+        except:
+            return 'There was an issue updating your info'
+    else:
+
+        return render_template('change_info_donor.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password)
+
+
+@app.route('/change_info_recipient/<int:id>', methods=['POST', 'GET'])
+def change_info_recipient(id):
+    # return render_template('product_input.html')
+    login = Login.query.get_or_404(id)
+    user = Recipient.query.get_or_404(id)
+    error=''
+    if request.method == 'POST':
+        email=request.form['email']
+        password=request.form['password']
+        name=request.form['name']
+        contact=str(request.form['contact'])
+        city=request.form['city']
+
+        if len(name)==0:
+            error='Invalid Name!'
+            return render_template('change_info_recipient.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password,error=error)
+
+        if len(email)==0:
+            error='Invalid Email!'
+            return render_template('change_info_recipient.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password,error=error)
+
+        if len(password)<6:
+            error='Invalid Password!'
+            return render_template('change_info_recipient.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password,error=error)
+
+        if len(contact)!=11 or contact[:2]!='03':
+            error='Invalid Contact!'
+            return render_template('change_info_recipient.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password,error=error)
+        
+        if len(city)==0:
+            error='Invalid City!'
+            return render_template('change_info_recipient.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password,error=error)
+        
+        try:
+            login.email_id=email
+            login.password=password
+
+            user.name=name
+            user.email_id=email
+            user.phone_number=contact
+            user.city=city
+            user.password=password
+
+            db.session.commit()
+            return render_template('recipient.html',id=id)
+        except:
+            return 'There was an issue updating your info'
+    else:
+
+        return render_template('change_info_recipient.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password)
+
+
+
+@app.route('/change_info_admin/<int:id>', methods=['POST', 'GET'])
+def change_info_admin(id):
+    # return render_template('product_input.html')
+    login = Login.query.get_or_404(id)
+    user = Administrator.query.get_or_404(id)
+    error=''
+    if request.method == 'POST':
+        email=request.form['email']
+        password=request.form['password']
+        name=request.form['name']
+
+        if len(name)==0:
+            error='Invalid Name!'
+            return render_template('change_info_admin.html',id=id , email=user.email_id,name=user.name,password=login.password,error=error)
+
+        if len(email)==0:
+            error='Invalid Email!'
+            return render_template('change_info_admin.html',id=id , email=user.email_id,name=user.name,password=login.password,error=error)
+
+        if len(password)<6:
+            error='Invalid Password!'
+            return render_template('change_info_admin.html',id=id , email=user.email_id,name=user.name,password=login.password,error=error)
+
+        
+        try:
+            login.email_id=email
+            login.password=password
+
+            user.name=name
+            user.email_id=email
+            user.password=password
+
+            db.session.commit()
+            return render_template('admin.html',id=id)
+        except:
+            return 'There was an issue updating your info'
+    else:
+
+        return render_template('change_info_admin.html',id=id , email=user.email_id,name=user.name,password=login.password)
 
 
 

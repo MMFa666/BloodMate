@@ -4,10 +4,10 @@ email='admin@bloodmate.com'
 password='qwerty'
 user_type='admin'
 name='King'
+id=generate_random_id()
+new_user=Administrator(id=id,email_id=email,name=name)
 
-new_user=Administrator(id=generate_random_id(),email_id=email,name=name)
-
-new_login = Login(id=generate_random_id(),email_id=email,password=password,user_type=user_type)
+new_login = Login(id=id,email_id=email,password=password,user_type=user_type)
 
 try:
     db.session.add(new_user)
