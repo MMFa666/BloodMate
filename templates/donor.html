@@ -27,15 +27,16 @@
 
         
         <br><br>
-
-        <form action="">
+        {% if status==True %}
+        <form action="/recipients_requests">
             <input type="submit" value="View Recipient Requests" />
         </form>
+        {% endif %}
         <br><br>
         
         
 
-        <form action="/screening_donor">
+        <form action="/screening_donor/{{id}}">
             <input type="submit" value="Book Screening Appointment" />
         </form>
 

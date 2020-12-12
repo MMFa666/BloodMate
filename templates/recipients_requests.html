@@ -14,6 +14,9 @@
                 Request ID
             </th>
             <th>
+                Recipient ID
+            </th>
+            <th>
                 Request Category
             </th>
             <th>
@@ -29,13 +32,12 @@
         {% for r in reqs %}
             <tr>
                 <td>{{ r.request_id }}</td>
+                <td>{{ r.recipient_id }}</td>
                 <td>{{ r.request_category }}</td>
                 <td>{{ r.blood_type }}</td>
                 <td>{{ r.quantity }}</td>
                 <td>
-                    <a href='/deleterecipientrequest/{{r.request_id}}'>Delete Request</a>
-                    <br>
-                    <a href=''>Update Request</a>
+                    <a href='/deleterecipientrequest/{{r.request_id}}/{{r.recipient_id}}'>Delete Request</a>
                 </td>
             </tr>
         {% endfor %}

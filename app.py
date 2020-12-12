@@ -12,6 +12,7 @@ def generate_random_id():
     return np.random.randint(0,1000000000)
 
 class Donor(db.Model):
+    __tablename__ = 'Donor'
     id = db.Column(db.Integer, primary_key=True, default=2)
     name = db.Column(db.String(30), nullable=False)
     date_of_birth = db.Column(db.DateTime)
@@ -24,6 +25,7 @@ class Donor(db.Model):
     screening_status = db.Column(db.Boolean())
     donation_category = db.Column(db.String(3))
     new_date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(8))
     #appointments = db.relationship('Screening_Appointment', backref='donor', lazy=True)
 
     
@@ -32,6 +34,7 @@ class Donor(db.Model):
         return '<Donor %r>' % self.id
 
 class Recipient(db.Model):
+    __tablename__ = 'Recipient'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), nullable=False)
     date_of_birth = db.Column(db.DateTime)
@@ -41,6 +44,7 @@ class Recipient(db.Model):
     phone_number = db.Column(db.String(13), nullable=False)
     blood_type = db.Column(db.String(3), nullable=False)
     rec_date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    request_status = db.Column(db.String(30))
     #appointments = db.relationship('Donation_Request', backref='recipient', lazy=True)
     
 
@@ -79,26 +83,31 @@ class Login(db.Model):
         return '<Login %r>' % self.id
 
 class Hospital(db.Model):
+    __tablename__ = 'Hospital'
     id = db.Column(db.Integer, primary_key=True)
     test_center_name = db.Column(db.String(50), nullable=False)
     location = db.Column(db.String(30))
     phone_number = db.Column(db.String(13), nullable=False)
     #appointments = db.relationship('Screening_Appointment', backref='hospital', lazy=True)
+    Screening_Appointment = db.relationship("Screening_Appointment", backref=db.backref("Screening_Appointment", uselist=False))
 
     def __repr__(self):
         return '<Hospital %r>' % self.id
 
 
 class Screening_Appointment(db.Model):
+    __tablename__ = 'Screening_Appointment'
     id = db.Column(db.Integer, primary_key=True)
     appointment_time = db.Column(db.DateTime)
-    appointment_date = db.Column(db.DateTime)
+    # appointment_date = db.Column(db.DateTime)
     screening_result = db.Column(db.Boolean())
-    #test_center_id = db.Column(db.Integer, db.ForeignKey('hospital.id'), nullable=False)
-    test_center_name = db.Column(db.String(50))
-    #donor_id = db.Column(db.Integer, db.ForeignKey('donor.id'), nullable=False)
+    test_center_id = db.Column(db.Integer, db.ForeignKey('Hospital.id'))
+    #test_center_name = db.Column(db.String(50))
+    donor_id = db.Column(db.Integer, db.ForeignKey('Donor.id'))
+    Hospital = db.relationship("Hospital", backref=db.backref("Hospital", uselist=False))
+    Donor = db.relationship("Donor", backref=db.backref("Donor", uselist=False))
     
-    phone_number = db.Column(db.String(13), nullable=False)
+   # phone_number = db.Column(db.String(13))
 
     def __repr__(self):
         return '<Screening_Appointment %r>' % self.id
@@ -109,7 +118,7 @@ class Donation_Request(db.Model):
     blood_type = db.Column(db.String(30), nullable=False)
     quantity =  db.Column(db.Integer,  nullable=False)     
     request_category = db.Column(db.String(20), nullable=False)
-    #recipient_id = db.Column(db.Integer, db.ForeignKey('recipient.id'), nullable=False)
+    recipient_id = db.Column(db.Integer, db.ForeignKey('Recipient.id'), nullable=False)
 
     def __repr__(self):
         return '<Donation_Request %r>' % self.request_id
@@ -129,9 +138,11 @@ def index():
             error='Invalid Credentials!'
             return render_template('index.html',error=error)
         else:
+            
             id=q.id
             if user_type=='donor':
-                return render_template('donor.html',id=id)
+                user = Donor.query.get_or_404(id)
+                return render_template('donor.html',id=id ,status=user.screening_status)
             elif user_type=='admin':
                 return render_template('admin.html',id=id)
             else:
@@ -178,25 +189,27 @@ def donate():
 def recipient_portal():
     return render_template('recipient.html')
 
-@app.route('/make_request_recipient', methods=['POST','GET'])
-def make_request_recipient():
+@app.route('/make_request_recipient/<int:id>', methods=['POST','GET'])
+def make_request_recipient(id):
+    user = Recipient.query.get_or_404(id)
     if request.method == 'POST':
         bloodType = request.form['bloodType']
         reqQuant = request.form['reqQuant'] 
         reqCat = request.form['reqCat']
-        
-        new_req = Donation_Request(request_id= generate_random_id(), blood_type= bloodType, quantity= reqQuant, request_category= reqCat)
+        req_st = 'Pending' #changing status request of recipient from no request to pending
+        new_req = Donation_Request(request_id= generate_random_id(), blood_type= bloodType, quantity= reqQuant, request_category= reqCat, recipient_id= user.id)
 
         try:
+            user.request_status = req_st
             db.session.add(new_req)
             db.session.commit()
-            return redirect('/recipient')
+            return render_template('recipient.html',id=id)
         except Exception as e:
             'There was an issue adding the blood product :('
             print(e)
             return redirect('/')
     else:
-        return render_template('make_request_recipient.html')
+        return render_template('make_request_recipient.html', id =id)
 
 
 @app.route('/new_request')
@@ -254,6 +267,7 @@ def deletedonor(id):
     login_del = Login.query.get_or_404(id)
     print(id)
     try:
+        donor_del.status = 'Inactive'
         db.session.delete(donor_del)
         db.session.delete(login_del)
         db.session.commit()
@@ -266,6 +280,7 @@ def deletedonor(id):
 def recipients_admin():
     recipients = Recipient.query.order_by(Recipient.rec_date_created).all()
     return render_template('recipients_admin.html', recipients=recipients)
+
 
 @app.route('/deleterecipient/<int:id>')
 def deleterecipient(id):
@@ -280,6 +295,57 @@ def deleterecipient(id):
     except Exception as e:
         print(e)
         return 'Delete Failed'
+
+@app.route('/deleterecipientrequest/<int:id>/<int:rid>')
+def deleterecipientrequest(id,rid):
+    rid = Recipient.query.get_or_404(rid)
+    print(rid)
+    #print(idd)
+    #ru = Recipient.query.get_or_404(idd)
+    #req_del = Recipient.query.get_or_404(id)
+    print(id)
+    req_del2 = Donation_Request.query.get_or_404(id)
+    print(id)
+    #print(idd)
+    try:
+        rid.request_status= 'No request'
+        db.session.delete(req_del2)
+        db.session.commit()
+        return redirect('/recipients_requests')
+    except Exception as e:
+        print(e)
+        return 'Delete Failed'
+
+@app.route('/perform_screening/<int:id>/<int:rid>')
+def perform_screening(id,rid):
+    app_del = Screening_Appointment.query.get_or_404(id)
+    don_del =Donor.query.get_or_404(rid)
+    log_del = Login.query.get_or_404(rid)
+    try:
+        db.session.delete(app_del)
+        db.session.delete(don_del)
+        db.session.delete(log_del)
+        db.session.commit()
+        # return render_template('screening_admin.html')
+        return redirect('/screening_admin')
+    except Exception as e:
+        print(e)
+        return 'Delete Failed'
+
+@app.route('/approve_screening/<int:id>/<int:rid>')
+def approve_screening(id,rid):
+    app_del = Screening_Appointment.query.get_or_404(id)
+    don =Donor.query.get_or_404(rid)
+    don.screening_status=True
+    try:
+        db.session.delete(app_del)
+        db.session.commit()
+        # return render_template('screening_admin.html')
+        return redirect('/screening_admin')
+    except Exception as e:
+        print(e)
+        return 'Delete Failed'
+
 
 @app.route('/donors_admin', methods=['POST','GET'])
 def donors_admin():
@@ -328,29 +394,38 @@ def deletehospital(id):
 
 @app.route('/screening_admin')
 def screening_admin():
-    return render_template('screening_admin.html')
+    sc_apps = Screening_Appointment.query.order_by(Screening_Appointment.appointment_time).all()
+    return render_template('screening_admin.html', sc_apps = sc_apps)
     
 
-@app.route('/screening_donor', methods=['POST', 'GET'])
-def screening_donor():
+@app.route('/screening_donor/<int:id>', methods=['POST', 'GET'])
+def screening_donor(id):
+    user = Donor.query.get_or_404(id)
+    print('here1')
     if request.method == 'POST':
+        print('here2')
         time_is = request.form['time_is'] 
-        app_date = request.form['app_date']
-        hosp_name = request.form['hosp_name']
-
-        
-        new_app = Screening_Appointment(id= generate_random_id(), appointment_time= time_is , appointment_date= app_date, test_center_name =hosp_name)
+        # app_date = request.form['app_date']
+        # app_date=datetime.strptime(app_date,'%Y-%m-%d')
+        # time_is = datetime.strptime(time_is, '%Y-%m-%d%H:%M')
+        date_processing = time_is.replace('T', '-').replace(':', '-').split('-')
+        date_processing = [int(v) for v in date_processing]
+        time_is = datetime(*date_processing)
+        # print('here3',time_is)
+        # return('as')
+        new_app = Screening_Appointment(id= generate_random_id(), appointment_time= time_is, donor_id = user.id, test_center_id = 0)
 
         try:
+            print('here')
             db.session.add(new_app)
             db.session.commit()
-            return redirect('/donor')
+            return render_template('donor.html', id=id)
         except Exception as e:
             'There was an issue adding the blood product :('
-            print(e)
+            print('Error',e)
             return redirect('/')
     else:
-        return render_template('screening_donor.html')  
+        return render_template('screening_donor.html', id=id)  
 
 @app.route('/product_input')
 def product_input():
@@ -371,6 +446,8 @@ def register():
         gender=request.form['gender']
         blood_type=request.form['blood_type']
         dob=request.form['dob']
+        status_d = 'Inactive' #status of donor
+        req_status = 'No request'
 
         if len(name)==0:
             error='Invalid Name!'
@@ -414,7 +491,9 @@ def register():
                                 city=city,
                                 blood_type=blood_type,
                                 phone_number=contact,
-                                date_of_birth=dob
+                                date_of_birth=dob,
+                                status = status_d,
+                                screening_status=False,
                                 )
             else:
                 new_user=Recipient(id=id,
@@ -424,7 +503,8 @@ def register():
                                 city=city,
                                 blood_type=blood_type,
                                 phone_number=contact,
-                                date_of_birth=dob
+                                date_of_birth=dob,
+                                request_status = req_status
                                 )
             try:
                 db.session.add(new_user)
@@ -457,26 +537,27 @@ def change_info_donor(id):
         name=request.form['name']
         contact=str(request.form['contact'])
         city=request.form['city']
+        status = request.form['sd']
 
         if len(name)==0:
             error='Invalid Name!'
-            return render_template('change_info_donor.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password,error=error)
+            return render_template('change_info_donor.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password, status = user.status, error=error)
 
         if len(email)==0:
             error='Invalid Email!'
-            return render_template('change_info_donor.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password,error=error)
+            return render_template('change_info_donor.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password, status = user.status ,error=error)
 
         if len(password)<6:
             error='Invalid Password!'
-            return render_template('change_info_donor.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password,error=error)
+            return render_template('change_info_donor.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password,status = user.status,error=error)
 
         if len(contact)!=11 or contact[:2]!='03':
             error='Invalid Contact!'
-            return render_template('change_info_donor.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password,error=error)
+            return render_template('change_info_donor.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password, status = user.status , error=error)
         
         if len(city)==0:
             error='Invalid City!'
-            return render_template('change_info_donor.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password,error=error)
+            return render_template('change_info_donor.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password, status = user.status, error=error)
         
         try:
             login.email_id=email
@@ -487,6 +568,7 @@ def change_info_donor(id):
             user.phone_number=contact
             user.city=city
             user.password=password
+            user.status = status
 
             db.session.commit()
             return render_template('donor.html',id=id)
@@ -494,7 +576,7 @@ def change_info_donor(id):
             return 'There was an issue updating your info'
     else:
 
-        return render_template('change_info_donor.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password)
+        return render_template('change_info_donor.html',id=id , email=user.email_id,city=user.city,phone_number=user.phone_number,name=user.name,password=login.password, status = user.status)
 
 
 @app.route('/change_info_recipient/<int:id>', methods=['POST', 'GET'])
@@ -590,7 +672,10 @@ def change_info_admin(id):
 
         return render_template('change_info_admin.html',id=id , email=user.email_id,name=user.name,password=login.password)
 
-
+@app.route('/recipient_request_status/<int:id>', methods=['GET', 'POST'])
+def recipient_request_status(id):
+    user = Recipient.query.get_or_404(id)
+    return render_template('recipient_request_status.html', id=id, req = user.request_status )
 
 if __name__ == "__main__":
     app.run(debug=True)
