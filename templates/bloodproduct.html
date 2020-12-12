@@ -5,6 +5,10 @@
 {% endblock %}
 
 {% block body %}
+<div class="container2">
+    <a href='/addproduct'>Add a New Product</a>
+</div>
+
 <div class="maincontainer">
     
 
@@ -43,7 +47,7 @@
                 <td>
                     <a href='/deleteproduct/{{bp.id}}'>Delete Product</a>
                     <br>
-                    <a href=''>Update Product</a>
+                    <a href='/updateproduct/{{bp.id}}'>Update Product</a>
                 </td>
             </tr>
         {% endfor %}
@@ -51,8 +55,6 @@
     
 
 </div>
-<div class="container2">
-    <a href='/addproduct'>Add a New Product</a>
-</div>
+
 
 {% endblock %}

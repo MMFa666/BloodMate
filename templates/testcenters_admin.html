@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<h1>Hello Admin! You are currently viewing list of all the hospitals</h1>
+<h1>Hello Admin! You are currently viewing all the hospitals</h1>
 {% endblock %}
 
 {% block body %}
@@ -23,9 +23,6 @@
                 Phone Number
             </th>
             <th>
-                Appointments
-            </th>
-            <th>
                 Action
             </th>
         </tr>
@@ -35,7 +32,6 @@
                 <td>{{ hosp.test_center_name }}</td>
                 <td>{{ hosp.location }}</td>
                 <td>{{ hosp.phone_number }}</td>
-                <td>{{ hosp.appointments }}</td>
                 <td>
                     <a href='/deletehospital/{{hosp.id}}'>Delete Hospital</a>
                     

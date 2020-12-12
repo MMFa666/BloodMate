@@ -16,7 +16,7 @@ donor_ids=[]
 test_center_ids=[]
 
 #Donors
-for i in range(1000):
+for i in range(5000):
     email_counter+=1
     password_counter+=1
     phone_counter+=1
@@ -33,7 +33,8 @@ for i in range(1000):
     gender=random.choice(genders)
     blood_type=random.choice(blood_types)
     dob=datetime.strptime('1990-04-04','%Y-%m-%d')
-    status_d = 'Inactive' #status of donor
+    status_d = random.choice(['Active','Active','Active','Active','Inactive']) #status of donor
+    screening_status=random.choice([True,True,True,True,False])
 
     id=generate_random_id()
     new_login = Login(id=id,email_id=email,password=password,user_type=user_type)
@@ -45,7 +46,7 @@ for i in range(1000):
                     blood_type=blood_type,
                     phone_number=contact,
                     date_of_birth=dob,
-                    screening_status=False,
+                    screening_status=screening_status,
                     status = status_d,
                     )
     try:
@@ -58,7 +59,7 @@ for i in range(1000):
 
 
 #Recipients
-for i in range(1000):
+for i in range(5000):
     email_counter+=1
     password_counter+=1
     phone_counter+=1
@@ -114,7 +115,7 @@ for i in range(1000):
         
 
 #Hospital
-for i in range(1000):
+for i in range(50):
     phone_counter+=1
 
     id=generate_random_id()
@@ -137,13 +138,14 @@ for i in range(1000):
 
 
 #Donation Requests
-for i in range(1000):
+for i in range(2000):
     bloodType = random.choice(blood_types)
     reqQuant = random.randint(1,4) 
-    reqCat = random.choice(blood_types)
+    reqCat = random.choice(blood_categories)
     recipient_id=random.choice(recipient_ids)
+    location=random.choice(cities)
     
-    new_req = Donation_Request(request_id= generate_random_id(), blood_type= bloodType, quantity= reqQuant, request_category= reqCat,recipient_id=recipient_id)
+    new_req = Donation_Request(request_id= generate_random_id(),location=location, blood_type= bloodType, quantity= reqQuant, request_category= reqCat,recipient_id=recipient_id)
 
     try:
         db.session.add(new_req)

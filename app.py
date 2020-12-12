@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import numpy as np
 from datetime import datetime
+from datetime import timedelta 
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bloodmate.db'
@@ -118,6 +119,7 @@ class Donation_Request(db.Model):
     blood_type = db.Column(db.String(30), nullable=False)
     quantity =  db.Column(db.Integer,  nullable=False)     
     request_category = db.Column(db.String(20), nullable=False)
+    location = db.Column(db.String(30))
     recipient_id = db.Column(db.Integer, db.ForeignKey('Recipient.id'), nullable=False)
 
     def __repr__(self):
@@ -160,7 +162,7 @@ def search_donor():
     city_is = request.form['location']
     blood_type_is = request.form['blood_type']
 
-    donors2 = Donor.query.filter_by(blood_type = blood_type_is, city= city_is).all()
+    donors2 = Donor.query.filter_by(blood_type = blood_type_is, city= city_is, screening_status=True, status='Active').all()
     return render_template('donors_search_result.html', donors2 = donors2)
 
 @app.route('/donor_search_hospital_help', methods =['POST', 'GET'])
@@ -196,8 +198,13 @@ def make_request_recipient(id):
         bloodType = request.form['bloodType']
         reqQuant = request.form['reqQuant'] 
         reqCat = request.form['reqCat']
+        location=request.form['location']
+
+        if int(reqQuant)<=0:
+            return render_template('make_request_recipient.html', id =id,error='Invalid Quantity')
+
         req_st = 'Pending' #changing status request of recipient from no request to pending
-        new_req = Donation_Request(request_id= generate_random_id(), blood_type= bloodType, quantity= reqQuant, request_category= reqCat, recipient_id= user.id)
+        new_req = Donation_Request(request_id= generate_random_id(), blood_type= bloodType, quantity= reqQuant, request_category= reqCat, recipient_id= user.id, location=location)
 
         try:
             user.request_status = req_st
@@ -229,7 +236,17 @@ def addproduct():
         prodCat = request.form['prodCat']
         expDate = request.form['expDate']
 
+        if expDate=='':
+            return render_template('addproduct.html',error='Expiry date not valid')
+        
+
         expDate= datetime.strptime(expDate,'%Y-%m-%d')
+
+        if int(prodQuant)<=0:
+            return render_template('addproduct.html',error='Quantity should be positive')
+        if expDate < datetime.utcnow()+ timedelta(hours=5):
+            return render_template('addproduct.html',error='Expiry date not valid')
+
         new_prod = Stock(id= generate_random_id(), blood_type= bloodType, quantity= prodQuant, category= prodCat, expiry_date= expDate)
 
         try:
@@ -255,6 +272,35 @@ def deleteproduct(id):
     except Exception as e:
         print(e)
         return 'Delete Failed'
+
+
+@app.route('/updateproduct/<int:id>', methods=['POST','GET'])
+def updateproduct(id):
+    prod = Stock.query.get_or_404(id)
+    if request.method == 'POST':
+        prodQuant = request.form['prodQuant']
+        expDate = request.form['expDate']
+        if expDate=='':
+            return render_template('updateproduct.html',id=id, quantity= prod.quantity,expiry_date=prod.expiry_date,error='Expiry date not valid')
+        
+        expDate= datetime.strptime(expDate,'%Y-%m-%d')
+
+        if int(prodQuant)<=0:
+            return render_template('updateproduct.html',id=id, quantity= prod.quantity,expiry_date=prod.expiry_date,error='Quantity should be positive')
+        if expDate < datetime.utcnow()+ timedelta(hours=5):
+            return render_template('updateproduct.html',id=id, quantity= prod.quantity,expiry_date=prod.expiry_date,error='Expiry date not valid')
+
+        prod.quantity=prodQuant
+        prod.expiry_date=expDate
+
+        try:
+            db.session.commit()
+            return redirect('/bloodproduct')
+        except Exception as e:
+            print(e)
+            return 'Update Failed'
+    else:
+        return render_template('updateproduct.html',id=id, quantity= prod.quantity,expiry_date=prod.expiry_date)
     
 @app.route('/bloodproduct', methods=['POST','GET'])
 def blood_product():
@@ -401,31 +447,44 @@ def screening_admin():
 @app.route('/screening_donor/<int:id>', methods=['POST', 'GET'])
 def screening_donor(id):
     user = Donor.query.get_or_404(id)
+    hosp=Hospital.query.order_by(Hospital.test_center_name).all()
+    names=[]
+    for h in hosp:
+        names.append(h.test_center_name)
     print('here1')
     if request.method == 'POST':
         print('here2')
         time_is = request.form['time_is'] 
-        # app_date = request.form['app_date']
+        name = request.form['name']
         # app_date=datetime.strptime(app_date,'%Y-%m-%d')
         # time_is = datetime.strptime(time_is, '%Y-%m-%d%H:%M')
+        if time_is=='':
+            return render_template('screening_donor.html',error='Invalid Appointment time',id=id)
         date_processing = time_is.replace('T', '-').replace(':', '-').split('-')
         date_processing = [int(v) for v in date_processing]
         time_is = datetime(*date_processing)
+
+        if time_is < datetime.utcnow()+ timedelta(hours=5):
+            return render_template('screening_donor.html',error='Invalid Appointment time',id=id,names=names)
         # print('here3',time_is)
         # return('as')
-        new_app = Screening_Appointment(id= generate_random_id(), appointment_time= time_is, donor_id = user.id, test_center_id = 0)
+        
+        q=Hospital.query.filter_by(test_center_name=name).first()
+
+        new_app = Screening_Appointment(id= generate_random_id(), appointment_time= time_is, donor_id = user.id, test_center_id = q.id)
 
         try:
             print('here')
             db.session.add(new_app)
             db.session.commit()
-            return render_template('donor.html', id=id)
+            return render_template('donor.html', id=id,status=user.screening_status)
         except Exception as e:
             'There was an issue adding the blood product :('
             print('Error',e)
             return redirect('/')
     else:
-        return render_template('screening_donor.html', id=id)  
+        
+        return render_template('screening_donor.html', id=id,names=names)  
 
 @app.route('/product_input')
 def product_input():
@@ -446,7 +505,7 @@ def register():
         gender=request.form['gender']
         blood_type=request.form['blood_type']
         dob=request.form['dob']
-        status_d = 'Inactive' #status of donor
+        status_d = 'Active' #status of donor
         req_status = 'No request'
 
         if len(name)==0:
@@ -474,6 +533,8 @@ def register():
             return render_template('register.html',error=error)
 
         dob=datetime.strptime(dob,'%Y-%m-%d')
+
+
         print(dob)
 
         print('aaaaaaaaaa')
@@ -677,5 +738,28 @@ def recipient_request_status(id):
     user = Recipient.query.get_or_404(id)
     return render_template('recipient_request_status.html', id=id, req = user.request_status )
 
+@app.route('/donor_search_recipient_requests', methods=['GET', 'POST'])
+def donor_search_recipient_requests():
+    if request.method == 'POST':
+        bloodType = request.form['bloodType']
+        reqCat = request.form['reqCat']
+        location=request.form['location']
+
+        reqs = Donation_Request.query.filter_by(location=location, blood_type= bloodType, request_category= reqCat).order_by(Donation_Request.request_id).all()
+        return render_template('donors_search_result_requests.html', reqs = reqs)
+
+
+
+    else:
+        return render_template('donor_search_recipient_requests.html')
+        
+@app.route('/donor_search_recipient_requests_first', methods=['GET', 'POST'])
+def donor_search_recipient_requests_first():
+    if request.method == 'POST':
+        return render_template('donor_search_recipient_requests.html')
+    else:
+        return render_template('donor_search_recipient_requests.html')
+
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)

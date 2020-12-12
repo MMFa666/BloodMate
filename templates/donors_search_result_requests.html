@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<h1>Hello Admin! You are currently viewing all the recipients' requests</h1>
+<h1>Search Results</h1>
 {% endblock %}
 
 {% block body %}
@@ -28,9 +28,6 @@
             <th>
                 Location
             </th>
-            <th>
-                Action
-            </th>
         </tr>
         {% for r in reqs %}
             <tr>
@@ -40,9 +37,6 @@
                 <td>{{ r.blood_type }}</td>
                 <td>{{ r.quantity }}</td>
                 <td>{{ r.location }}</td>
-                <td>
-                    <a href='/deleterecipientrequest/{{r.request_id}}/{{r.recipient_id}}'>Delete Request</a>
-                </td>
             </tr>
         {% endfor %}
     </table>

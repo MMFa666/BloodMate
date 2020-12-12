@@ -7,32 +7,32 @@
 {% block body %}
 <div class="maincontainer">
     
-    <div class="content">
-        <h1 style="text-align: center">Add Product</h1>
+    <div class="content_req">
+        <h1 style="text-align: center; padding-top: 12px; ">Search Donation Requests</h1>
         <div class="form">
-            <form action="/addproduct" method='POST'>
+            <form action="/donor_search_recipient_requests" method='POST'>
     
-                <div class="inputcontainer" style="height: 140px;">
+                <div class="inputcontainer">
                     <div class="labelstyle">
                         <div class="anothercontainer2">
                             <div class="inside">
-                                <label for="prodCat">Category:   </label><br>
+                                <label for="reqCat">Category:   </label><br>
                             </div>
                             <div class="inside">
                                 <label for="bloodType">Blood Type:   </label><br>
                             </div>
+
                             <div class="inside">
-                                <label for="prodQuant">Quantity:   </label><br>
+                                <label for="location">City:   </label><br>
+
                             </div>
-                            <div class="inside">
-                                <label for="expDate">Expiry Date:   </label><br>
-                            </div>
+                           
                         </div>
                     </div>
                     <div class="labelstyle">
                         <div class="anothercontainer">
                             <div class="inside">
-                                <select id="prodCat" name="prodCat" style="width: 175px;">
+                                <select id="reqCat" name="reqCat" style="width: 175px;">
                                     <option value="Blood">Blood</option>
                                     <option value="Plasma">Plasma</option>
                                     <option value="RBC">RBC</option>
@@ -53,21 +53,24 @@
                                 </select>
                             </div>
                             <div class="inside">
-                                <input type="number" name="prodQuant" id="prodQuant" value="1"><br>
-                            </div>
-                            
-                            <div class="inside">
-                                <input type="date" name="expDate" id="expDate">
-                            </div>
+                                <select id="location" name="location" style="width: 175px;">
+                                    <option value="Karachi">Karachi</option>
+                                    <option value="Lahore">Lahore</option>
+                                    <option value="Islamabad">Islamabad</option>
+                                    <option value="Multan">Multan</option>
+                                    <option value="Faisalabad">Faisalabad</option>
+                                    <option value="Peshawar">Peshawar</option>
+                                </select>
 
+                            </div>
                     
                         </div>
     
                     </div>
                     
                 </div>
-                <p style="margin: 5px; color: maroon; text-align: center;">{{error}}</p>
-                <input type="submit" value="Submit">
+                <p style="margin: 70px; color: maroon; text-align: center;">{{error}}</p>
+                <input type="submit" value="Search">
             </form>
 
         </div>

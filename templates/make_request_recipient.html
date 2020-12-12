@@ -12,7 +12,7 @@
         <div class="form">
             <form action="/make_request_recipient/{{id}}" method='POST'>
     
-                <div class="inputcontainer">
+                <div class="inputcontainer" style="height: 150px;">
                     <div class="labelstyle">
                         <div class="anothercontainer2">
                             <div class="inside">
@@ -24,19 +24,49 @@
                             <div class="inside">
                                 <label for="reqQuant">Quantity:   </label><br>
                             </div>
+                            <div class="inside">
+                                <label for="location">City:   </label><br>
+
+                            </div>
                            
                         </div>
                     </div>
                     <div class="labelstyle">
                         <div class="anothercontainer">
                             <div class="inside">
-                                <input type="text" name="reqCat" id="reqCat"><br>
+                                <select id="reqCat" name="reqCat" style="width: 175px;">
+                                    <option value="Blood">Blood</option>
+                                    <option value="Plasma">Plasma</option>
+                                    <option value="RBC">RBC</option>
+                                    <option value="WBC">WBC</option>
+                                    <option value="Platelets">Platelets</option>
+                                </select>
                             </div>
                             <div class="inside">
-                                <input type="text" name="bloodType" id="bloodType"><br>
+                                <select id="bloodType" name="bloodType" style="width: 175px;">
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
                             </div>
                             <div class="inside">
-                                <input type="number" name="reqQuant" id="reqQuant"><br>
+                                <input type="number" name="reqQuant" id="reqQuant" value="1"><br>
+                            </div>
+                            <div class="inside">
+                                <select id="location" name="location" style="width: 175px;">
+                                    <option value="Karachi">Karachi</option>
+                                    <option value="Lahore">Lahore</option>
+                                    <option value="Islamabad">Islamabad</option>
+                                    <option value="Multan">Multan</option>
+                                    <option value="Faisalabad">Faisalabad</option>
+                                    <option value="Peshawar">Peshawar</option>
+                                </select>
+
                             </div>
                     
                         </div>
@@ -44,7 +74,7 @@
                     </div>
                     
                 </div>
-                <p style="margin: 70px; color: maroon; text-align: center;">{{error}}</p>
+                <p style="margin: 10px; color: maroon; text-align: center;">{{error}}</p>
                 <input type="submit" value="Submit Request">
             </form>
 

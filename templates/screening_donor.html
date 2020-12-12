@@ -12,33 +12,42 @@
         <div class="form">
             <form action="/screening_donor/{{id}}" method='POST'>
     
-                <div class="inputcontainer">
+                <div class="inputcontainer" style="height: 100px;">
                     <div class="labelstyle">
                         <div class="anothercontainer2">
                             <div class="inside">
+                                <label for="name">Center:   </label><br>
+                            </div>
+                            <div class="inside">
                                 <label for="time_is">Time:   </label><br>
                             </div>
-                            <!-- <div class="inside">
-                                <label for="app_date">Date:   </label><br>
-                            </div> -->
                            
                         </div>
                     </div>
                     <div class="labelstyle">
+                        <div class="inside">
+                            <select id="name" name="name" style="width: 175px;">
+                                {% for name in names %}
+                                <option value={{name}}>{{name}}</option>
+                                <!-- <option value="Lahore">Lahore</option>
+                                <option value="Islamabad">Islamabad</option>
+                                <option value="Multan">Multan</option>
+                                <option value="Faisalabad">Faisalabad</option>
+                                <option value="Peshawar">Peshawar</option> -->
+                                {% endfor %}
+                            </select>
+                        </div>
                         <div class="anothercontainer">
                             <div class="inside">
                                 <input type="datetime-local" name="time_is" id="time_is"><br>
                             </div>
-                            <!-- <div class="inside">
-                                <input type="date" name="app_date" id="app_date"><br>
-                            </div> -->
                           
                         </div>
     
                     </div>
                     
                 </div>
-                <p style="margin: 90px; color: maroon; text-align: center;">{{error}}</p>
+                <p style="margin: 10px; color: maroon; text-align: center;">{{error}}</p>
                 <input type="submit" value="Submit">
             </form>
 

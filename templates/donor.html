@@ -28,9 +28,12 @@
         
         <br><br>
         {% if status==True %}
-        <form action="/recipients_requests">
+        <form action="/donor_search_recipient_requests_first">
             <input type="submit" value="View Recipient Requests" />
         </form>
+        {% endif %}
+        {% if status==False %}
+        <h4>Please Get Screened to avail other options.</h4>
         {% endif %}
         <br><br>
         
